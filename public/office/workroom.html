@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>工作间座位图</title>
+    <script>
+      if (location.protocol === 'http:' || location.protocol === 'https:') {
+        const fragment = location.hash.slice(1)
+        let destination = '#office'
+        if (fragment === 'office' || fragment.startsWith('office?')) {
+          destination = '#' + fragment
+        } else if (/^[A-D][1-6]$/i.test(fragment)) {
+          destination += '?seat=' + fragment.toUpperCase()
+        }
+        location.replace('/' + location.search + destination)
+      }
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei',
+          sans-serif;
+        color: #293830;
+        background: #f5f3ed;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid #8db591;
+        outline-offset: 2px;
+      }
+      main {
+        max-width: 1380px;
+        margin: auto;
+        padding: 24px clamp(12px, 3vw, 38px) 36px;
+      }
+      header,
+      .head-actions,
+      .room-count,
+      dialog footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      header {
+        justify-content: space-between;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: clamp(19px, 2.4vw, 28px);
+        font-weight: 680;
+        letter-spacing: -0.05em;
+      }
+      header p {
+        font-size: 12px;
+        color: #6b776e;
+        margin-top: 5px;
+      }
+      .head-actions {
+        flex-wrap: wrap;
+      }
+      button.action,
+      dialog button {
+        border: 1px solid #cdd6cc;
+        border-radius: 8px;
+        background: #fffefa;
+        color: #3a5648;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 550;
+      }
+      .action.primary,
+      dialog .primary {
+        background: #395e4a;
+        color: #fff;
+        border-color: #395e4a;
+      }
+      .room {
+        position: relative;
+        container-type: inline-size;
+        overflow: hidden;
+        border: 1px solid #dbdacf;
+        border-radius: 14px;
+        background: #eeeae0;
+        box-shadow: 0 4px 24px #23331e0d;
+      }
+      .room img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .labels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .labels[hidden] {
+        display: none;
+      }
+      .seat {
+        position: absolute;
+        pointer-events: auto;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        max-width: 15%;
+        border: 1px solid #5b5d4b55;
+        border-radius: 99px;
+        background: #fffdf3f2;
+        color: #3d483e;
+        box-shadow: 0 1px 4px #443c2e36;
+        padding: 0.18em 0.56em;
+        font-weight: 650;
+        font-size: clamp(9px, 1.05cqw, 14px);
+        line-height: 1.4;
+        cursor: pointer;
+      }
+      .seat span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .seat:hover,
+      .seat:focus-visible {
+        background: white;
+        border-color: #487d60;
+        z-index: 1;
+      }
+      .seat.occupied {
+        background: #355845ef;
+        color: #fff;
+        border-color: #e6f0ddd9;
+      }
+      .seat.occupied span:first-child {
+        opacity: 0.8;
+        font-size: 0.85em;
+        margin-right: 0.45em;
+      }
+      .room-count {
+        margin-top: 12px;
+        justify-content: space-between;
+        color: #6f776c;
+        font-size: 12px;
+        flex-wrap: wrap;
+      }
+      dialog {
+        padding: 21px;
+        border: 1px solid #d3d9cf;
+        border-radius: 13px;
+        background: #fffefb;
+        color: #283a2f;
+        width: min(350px, calc(100% - 28px));
+        box-shadow: 0 16px 70px #283f2926;
+      }
+      dialog::backdrop {
+        background: #252b294a;
+      }
+      dialog h2 {
+        font-size: 18px;
+      }
+      dialog label {
+        display: grid;
+        gap: 7px;
+        margin: 17px 0;
+        font-size: 12px;
+        color: #5f6c60;
+      }
+      dialog input {
+        padding: 10px;
+        border: 1px solid #bdcbba;
+        border-radius: 6px;
+        font-size: 15px;
+        color: #273a2b;
+        background: #fff;
+      }
+      dialog footer {
+        justify-content: flex-end;
+      }
+      .feedback {
+        min-height: 1.4em;
+        font-size: 12px;
+        color: #5f725d;
+      }
+      @media (max-width: 580px) {
+        main {
+          padding: 14px 8px;
+        }
+        .head-actions {
+          gap: 7px;
+        }
+        .action {
+          padding: 6px 9px !important;
+        }
+        .room {
+          border-radius: 7px;
+        }
+        .seat {
+          font-size: clamp(8px, 2cqw, 10px);
+          padding: 0.05em 0.33em;
+        }
+        .room-count {
+          gap: 4px;
+        }
+        .seat.occupied {
+          max-width: 15%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>工作间座位图</h1>
+          <p>点击工位编号修改姓名，留空即可清除。</p>
+        </div>
+        <div class="head-actions">
+          <button class="action" id="toggle" type="button" aria-pressed="true">
+            隐藏标签</button
+          ><button class="action primary" id="export" type="button">
+            导出座位图
+          </button>
+          <label id="offlinePicker" hidden
+            >选择原图并导出
+            <input id="offlineArt" type="file" accept=".png,image/png" />
+          </label>
+        </div>
+      </header>
+      <div class="room">
+        <img
+          id="art"
+          src="./workroom.png"
+          alt="Q 版工作间俯视图，左侧为三组工位，右侧为六人对坐桌组，入口在右下方"
+        />
+        <div class="labels" id="labels"></div>
+      </div>
+      <div class="room-count">
+        <span id="count"></span
+        ><span class="feedback" role="status" id="message"></span>
+      </div>
+      <dialog id="editor">
+        <form id="form">
+          <h2 id="deskTitle"></h2>
+          <label
+            >姓名<input
+              id="person"
+              autocomplete="off"
+              maxlength="16"
+              placeholder="输入姓名或昵称"
+          /></label>
+          <footer>
+            <button type="button" id="cancel">取消</button
+            ><button class="primary">保存</button>
+          </footer>
+        </form>
+      </dialog>
+      <script>
+        'use strict'
+        const seats = [
+          ['A1', 15.033, 18.234],
+          ['A2', 27.815, 18.234],
+          ['A3', 40.464, 18.234],
+          ['B1', 16.225, 48.848],
+          ['B2', 29.073, 48.848],
+          ['B3', 41.987, 48.848],
+          ['B4', 16.225, 59.597],
+          ['B5', 29.073, 59.597],
+          ['B6', 41.987, 59.597],
+          ['C1', 16.556, 89.635],
+          ['C2', 28.609, 89.635],
+          ['C3', 41.325, 89.635],
+          ['C4', 53.841, 89.635],
+          ['D1', 69.404, 27.735],
+          ['D2', 77.351, 27.735],
+          ['D3', 69.404, 44.146],
+          ['D4', 77.351, 44.146],
+          ['D5', 69.404, 61.612],
+          ['D6', 77.351, 61.612],
+        ]
+        const byId = (id) => document.getElementById(id)
+        const art = byId('art'),
+          labels = byId('labels'),
+          editor = byId('editor'),
+          person = byId('person'),
+          message = byId('message')
+        const storageKey = 'stackpilot.office.seating.v1'
+        let names = {},
+          selected = null
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || '{}')
+          for (const [id] of seats)
+            if (typeof saved?.[id] === 'string')
+              names[id] = saved[id].slice(0, 16)
+        } catch {}
+        function render() {
+          labels.replaceChildren()
+          for (const [id, x, y] of seats) {
+            const button = document.createElement('button')
+            button.type = 'button'
+            button.dataset.seat = id
+            button.className = 'seat' + (names[id] ? ' occupied' : '')
+            button.style.left = x + '%'
+            button.style.top = y + '%'
+            button.setAttribute(
+              'aria-label',
+              id + ' 工位，' + (names[id] || '未填写姓名'),
+            )
+            for (const text of [id, names[id]].filter(Boolean)) {
+              const span = document.createElement('span')
+              span.textContent = text
+              button.append(span)
+            }
+            button.onclick = () => {
+              selected = id
+              person.value = names[id] || ''
+              byId('deskTitle').textContent = id + ' 工位'
+              editor.showModal()
+              person.select()
+            }
+            labels.append(button)
+          }
+          byId('count').textContent =
+            seats.length +
+            ' 个工位 · ' +
+            seats.filter(([id]) => names[id]).length +
+            ' 个已填写姓名'
+        }
+        byId('cancel').onclick = () => editor.close()
+        byId('form').onsubmit = (e) => {
+          e.preventDefault()
+          if (!selected) return
+          names[selected] = person.value.trim()
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(names))
+            message.textContent = '姓名已保存到当前浏览器。'
+          } catch {
+            message.textContent = '当前浏览器无法持久保存，可先导出座位图。'
+          }
+          editor.close()
+          render()
+          labels.querySelector('[data-seat="' + selected + '"]')?.focus()
+        }
+        byId('toggle').onclick = (e) => {
+          labels.hidden = !labels.hidden
+          e.currentTarget.textContent = labels.hidden ? '显示标签' : '隐藏标签'
+          e.currentTarget.setAttribute('aria-pressed', String(!labels.hidden))
+        }
+        let selectedArt = null
+        byId('offlineArt').onchange = async (e) => {
+          const file = e.currentTarget.files[0]
+          if (!file) return
+          const url = URL.createObjectURL(file)
+          try {
+            const img = new Image()
+            img.src = url
+            await img.decode()
+            if (
+              img.naturalWidth !== art.naturalWidth ||
+              img.naturalHeight !== art.naturalHeight
+            )
+              throw Error()
+            selectedArt = img
+            byId('offlinePicker').hidden = true
+            await exportRoom()
+          } catch {
+            message.textContent = '请选择与此座位图配套的 workroom.png。'
+          } finally {
+            URL.revokeObjectURL(url)
+            e.target.value = ''
+          }
+        }
+        async function exportRoom() {
+          try {
+            await art.decode()
+            const canvas = document.createElement('canvas')
+            canvas.width = art.naturalWidth
+            canvas.height = art.naturalHeight
+            const c = canvas.getContext('2d')
+            c.drawImage(selectedArt || art, 0, 0)
+            if (!labels.hidden) {
+              const font = Math.max(12, canvas.width * 0.0098)
+              c.font = '600 ' + font + 'px sans-serif'
+              c.textAlign = 'center'
+              c.textBaseline = 'middle'
+              for (const [id, x, y] of seats) {
+                const cx = (canvas.width * x) / 100,
+                  cy = (canvas.height * y) / 100,
+                  value = [id, names[id]].filter(Boolean).join('  ')
+                const h = font * 1.8,
+                  w = Math.min(
+                    canvas.width * 0.15,
+                    c.measureText(value).width + font * 1.25,
+                  )
+                c.fillStyle = names[id] ? '#355845f0' : '#fffdf3f2'
+                c.strokeStyle = '#71816c80'
+                c.beginPath()
+                c.roundRect(cx - w / 2, cy - h / 2, w, h, h / 2)
+                c.fill()
+                c.stroke()
+                c.fillStyle = names[id] ? '#fff' : '#394739'
+                c.fillText(value, cx, cy + font * 0.04, w - font * 0.65)
+              }
+            }
+            const blob = await new Promise((resolve) =>
+              canvas.toBlob(resolve, 'image/png'),
+            )
+            if (!blob) throw Error()
+            const url = URL.createObjectURL(blob),
+              a = document.createElement('a')
+            a.href = url
+            a.download = '工作间座位图.png'
+            a.click()
+            setTimeout(() => URL.revokeObjectURL(url), 2000)
+          } catch (error) {
+            if (
+              location.protocol === 'file:' &&
+              error.name === 'SecurityError'
+            ) {
+              byId('offlinePicker').hidden = false
+              message.textContent =
+                '请选择同目录的 workroom.png，浏览器将使用所选原图导出。'
+            } else {
+              message.textContent = '导出失败，请检查原图后重试。'
+            }
+          }
+        }
+        byId('export').onclick = exportRoom
+        render()
+      </script>
+    </main>
+  </body>
+</html>

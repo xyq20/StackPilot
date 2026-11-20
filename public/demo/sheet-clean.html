@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>表格清洗工具 · StackPilot 离线示例</title>
+    <style>
+      :root {
+        font:
+          15px/1.6 Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          'PingFang SC',
+          'Microsoft YaHei',
+          sans-serif;
+        color: #25253c;
+        background: #f5f5fa;
+        font-synthesis: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      main {
+        max-width: 1100px;
+        margin: auto;
+        padding: clamp(24px, 6vw, 84px) 24px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 30px;
+      }
+      h1 {
+        font-size: clamp(25px, 4vw, 35px);
+        line-height: 1.2;
+        letter-spacing: -0.04em;
+        margin: 4px 0;
+      }
+      .logo {
+        display: grid;
+        place-items: center;
+        width: 55px;
+        height: 55px;
+        border-radius: 16px;
+        background: #5c4bc6;
+        color: white;
+        font-size: 30px;
+        font-weight: 600;
+      }
+      .caption {
+        color: #7361c4;
+        font-size: 13px;
+        font-weight: 650;
+      }
+      p {
+        color: #636475;
+        margin: 8px 0 16px;
+      }
+      .panes {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: white;
+        border: 1px solid #e2dfee;
+        border-radius: 16px;
+        padding: 20px;
+      }
+      label {
+        font-weight: 650;
+      }
+      textarea {
+        width: 100%;
+        resize: vertical;
+        min-height: 225px;
+        border: 1px solid #dad7e7;
+        padding: 12px;
+        border-radius: 8px;
+        background: #fcfbff;
+        font:
+          14px/1.7 ui-monospace,
+          monospace;
+        color: inherit;
+        white-space: pre;
+        overflow: auto;
+      }
+      textarea:focus,
+      button:focus-visible {
+        outline: 3px solid #9682e9;
+        outline-offset: 2px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        padding: 6px 15px;
+        border: 1px solid #dad7e7;
+        color: #49465b;
+        background: white;
+        border-radius: 8px;
+      }
+      button.primary {
+        background: #6652c9;
+        color: white;
+        border-color: #6652c9;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+      #status {
+        min-height: 1.6em;
+        color: #45425c;
+        font-size: 14px;
+      }
+      @media (max-width: 700px) {
+        .panes {
+          grid-template-columns: 1fr;
+        }
+        textarea {
+          min-height: 150px;
+        }
+        main {
+          padding: 28px 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="logo" aria-hidden="true">▦</div>
+        <div>
+          <div class="caption">StackPilot 离线工具示例 · v1.2.0</div>
+          <h1>表格清洗工具</h1>
+        </div>
+      </header>
+      <p>
+        从 Excel
+        或其他表格复制多行数据，清理每个单元格两端的空格、空行和完全相同的行。支持制表符分列，每条记录占一行。
+      </p>
+      <div class="panes">
+        <section>
+          <label for="input">原始表格</label
+          ><textarea
+            id="input"
+            spellcheck="false"
+            placeholder="粘贴表格，或载入下方样例"
+          ></textarea>
+          <div class="actions">
+            <button id="clean" class="primary">清洗表格</button
+            ><button id="sample">载入样例</button>
+          </div>
+        </section>
+        <section>
+          <label for="output">清洗结果</label
+          ><textarea
+            id="output"
+            readonly
+            placeholder="清洗后的数据将显示在这里"
+          ></textarea>
+          <div class="actions">
+            <button id="copy" disabled>复制结果</button
+            ><button id="save" disabled>下载 TSV</button>
+          </div>
+        </section>
+      </div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script>
+      const element = (id) => document.getElementById(id)
+      const input = element('input')
+      const output = element('output')
+      const status = element('status')
+      function reset() {
+        output.value = ''
+        status.textContent = ''
+        element('copy').disabled = true
+        element('save').disabled = true
+      }
+      input.addEventListener('input', reset)
+      element('sample').addEventListener('click', () => {
+        reset()
+        input.value =
+          '商品编码\t 商品名 \t数量\nSK-001\t 桌面收纳盒\t12\nSK-002\t文件夹\t 8\n\nSK-001\t桌面收纳盒\t12'
+        input.focus()
+      })
+      element('clean').addEventListener('click', () => {
+        reset()
+        if (!input.value.trim()) {
+          status.textContent = '请先粘贴表格或载入样例。'
+          return
+        }
+        const unique = new Set()
+        let blanks = 0,
+          duplicates = 0
+        for (const line of input.value.split(/\r\n?|\n/)) {
+          const cells = line.split('\t').map((cell) => cell.trim())
+          if (cells.every((cell) => !cell)) {
+            blanks++
+            continue
+          }
+          const row = cells.join('\t')
+          if (unique.has(row)) {
+            duplicates++
+            continue
+          }
+          unique.add(row)
+        }
+        output.value = [...unique].join('\n')
+        status.textContent =
+          '保留 ' +
+          unique.size +
+          ' 行，清除 ' +
+          blanks +
+          ' 个空行和 ' +
+          duplicates +
+          ' 个重复行。'
+        element('copy').disabled = false
+        element('save').disabled = false
+      })
+      element('copy').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(output.value)
+          status.textContent = '已复制清洗结果，可粘贴到表格。'
+        } catch {
+          output.focus()
+          output.select()
+          status.textContent = '已选中结果，请按 Ctrl+C 或 ⌘C 复制。'
+        }
+      })
+      element('save').addEventListener('click', () => {
+        const blob = new Blob(['\uFEFF', output.value], {
+          type: 'text/tab-separated-values;charset=utf-8',
+        })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = '清洗结果.tsv'
+        link.click()
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
+      })
+    </script>
+  </body>
+</html>

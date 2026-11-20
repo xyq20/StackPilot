@@ -1,0 +1,213 @@
+.ol-person {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  width: 7.1%;
+  height: 15.7%;
+  outline-offset: 1px;
+  color: white;
+  cursor: pointer;
+  isolation: isolate;
+}
+.ol-person.dim {
+  opacity: 0.24;
+}
+.ol-pose,
+.ol-figure {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 91%;
+}
+.ol-figure {
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+}
+.ol-person.seated .ol-figure {
+  object-fit: contain;
+  object-position: center bottom;
+}
+.ol-figure.mirror {
+  transform: scaleX(-1);
+}
+.ol-shadow {
+  position: absolute;
+  inset: auto 17% 0;
+  height: 7%;
+  background: #66513745;
+  border-radius: 50%;
+  filter: blur(1px);
+  z-index: -1;
+}
+.ol-person.seated .ol-shadow {
+  display: none;
+}
+.ol-speech,
+.ol-away {
+  font:
+    600 clamp(8px, 1.16cqw, 15px) / 1.35 -apple-system,
+    BlinkMacSystemFont,
+    'PingFang SC',
+    sans-serif;
+  color: #544655;
+  background: #fffdf5;
+  border: 1px solid #b6a998;
+  border-radius: 0.7em 0.7em 0.7em 0.2em;
+  box-shadow: 0 1px 3px #49374730;
+  white-space: nowrap;
+}
+.ol-speech {
+  position: absolute;
+  bottom: 97%;
+  left: 45%;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.13em 0.48em;
+  pointer-events: none;
+}
+.ol-speech i {
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: var(--person-tone);
+}
+.ol-away {
+  position: absolute;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+  padding: 3px 5px;
+}
+.ol-charging-shelf,
+.ol-cooler {
+  position: absolute;
+  transform: translate(-50%, -100%);
+}
+.ol-charging-shelf {
+  width: 4.9702%;
+  pointer-events: none;
+  filter: drop-shadow(1px 2px 1px #624c322c);
+}
+.ol-cooler {
+  width: 3.844%;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+  background: none;
+}
+.ol-cooler img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(1px 2px 1px #624c322c);
+}
+.ol-cooler:enabled:hover {
+  filter: brightness(1.08);
+}
+.ol-cooler:focus-visible {
+  outline: 2px solid #735da8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (pointer: coarse) {
+  .ol-cooler::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    min-width: 28px;
+    min-height: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+.or-nameplate {
+  z-index: 1300;
+}
+.or-live-toggle {
+  height: 26px !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  font-size: 10px;
+}
+.or-live-toggle[aria-pressed='true'] {
+  background: #f2eef9;
+  border-color: #dcd3ee;
+  color: #745fa8;
+}
+@media (max-width: 550px) {
+  .or-live-toggle {
+    padding: 0 4px;
+  }
+  .or-map-actions {
+    gap: 2px;
+  }
+  .or-live-toggle svg {
+    display: none;
+  }
+  .ol-speech {
+    font-size: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ol-person,
+  .ol-pose,
+  .ol-person .ol-pose,
+  .ol-person .ol-prop {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+.ol-person.current.standing .ol-shadow {
+  background: color-mix(in srgb, var(--person-tone) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--person-tone) 65%, transparent);
+}
+
+.ol-desk-equipment {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ol-work-display {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  width: 6.43%;
+  height: 3.15%;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: inset 0 0 2px #252a3b44;
+}
+
+.ol-chair-back {
+  position: absolute;
+  pointer-events: none;
+}
+.ol-door-leaf {
+  position: absolute;
+  left: 82.8363%;
+  top: 71.0173%;
+  width: 11.2657%;
+  height: 27.0633%;
+  pointer-events: none;
+  z-index: 1100;
+}
+.ol-person[data-pose='speak'][data-facing='east'] .ol-speech {
+  left: auto;
+  right: 45%;
+}
+.or-bubble {
+  z-index: 1150;
+}
+.ol-away {
+  z-index: 1200;
+}

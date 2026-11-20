@@ -1,0 +1,19 @@
+工作间人物图集 · 生成记录
+
+参考图：public/office/room-empty.png
+每一组均以以下共用提示词加上对应人物描述生成，使用透明输出。
+
+Game production sprite atlas for the supplied miniature office. The room image is only a reference for warm orthographic elevated camera angle, softly lit clay-like 3D shapes, subsurface pastel shading and color balance. Generate only characters on real transparent alpha. WIDE 3:2 canvas EXACTLY 5 columns, 2 rows, all ten cells same size, separated by generous empty gutters. One upright full body including shoes per cell. TOP ROW five different original Chinese young adult operations coworkers, unobstructed FRONT three quarter facing slightly toward viewer's RIGHT. BOTTOM ROW exactly the corresponding BACK views of the five people above, backs of heads and clothes visible, all facing away. Match hair, clothes, accessories and colors exactly in the front/back of each column. Their feet all land at a shared baseline inside each row, same 2-to-2.5-head-tall chibi proportion with big heads, little hands and short legs, gently elevated camera looking down on hair, both arms close to body, relaxed neutral standing posture. Five equal visual scales, easy to read individually at 48px. Like handcrafted matte vinyl collectible figures; no printed thick outlines. Light from upper left. Do not copy the room: no room or furniture, no surface, pedestals, cast shadows, outlines around cutouts, text, letters, labels, numbers, border, grid, logos or watermarks. All pixels outside each silhouette including between feet are fully transparent. Do not cut off hair/accessories or feet. No pairs touching, ample horizontal margin. Top row maps one-to-one to bottom row. Character columns left to right: 
+
+m01–m05
+Five young adult MEN. 1 navy-blue baseball cap, ochre yellow hoodie, charcoal pants; 2 wavy chestnut hair, round dark glasses, pine-green knit vest over cream shirt, khaki trousers; 3 short jet-black spiky hair, cobalt blue varsity jacket with pale contrasting sleeves, gray trousers; 4 copper burnt-orange beanie, dark teal utility overshirt, warm brown chinos; 5 black center-part hair, muted lavender cardigan over white tee, black slacks.
+
+m06–m10
+Five young adult MEN. 1 black curly hair, coral-orange zip jacket, navy jeans; 2 fluffy silver grey short hair, midnight indigo pullover, stone trousers; 3 petrol-blue knit beanie, oatmeal waffle sweater with a broad chest stripe in teal, jeans; 4 dark hair in a small topknot, bottle-green utility bib overalls over a honey-mustard tee; 5 chocolate brown swept hair, chunky amber headphones worn on top, brick-red plaid overshirt and black jeans.
+
+f01–f05
+Five young adult WOMEN. 1 chin-length ink black bob with straight bangs, scarlet red beret and ecru striped top with navy wide trousers; 2 chestnut high ponytail, butter-yellow hooded jacket, charcoal straight pants; 3 long dark straight hair, sage-green round glasses, lavender overalls over cream tee; 4 auburn hair tied into two low small buns, lively deep teal cardigan over pale yellow tee, navy pants; 5 peach-brown short pixie hair, large round ivory glasses, denim-blue short jacket, sand trousers.
+
+f06–f10
+Five young adult WOMEN. 1 black braided hair plus a tiny mint ribbon, bright terracotta pinafore over cream long sleeves, black leggings; 2 wavy chestnut lob with thick teal headband, pale sky-blue sweater and charcoal slacks; 3 short silver lavender bob, plum-purple utility jacket, ivory trousers; 4 long dark high bun, warm cinnamon-orange sweater and denim blue overalls; 5 dark caramel hair in a single side ponytail, soft yellow bucket hat, a deep jade-green jacket over ivory tee, tan trousers.
+
